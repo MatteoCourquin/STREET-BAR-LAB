@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# StreetBarLab
 
-## Getting Started
+SEO test site — a street workout blog + free tools. Target keyword for the landing page: **"street workout program"** (secondary: calisthenics program, beginner street workout).
 
-First, run the development server:
+Stack: Next.js 16 (App Router, Cache Components), Tailwind CSS v4, TypeScript.
+
+## Run
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # fill in what you need
+npm run dev                  # http://localhost:3000
+npm run build && npm start   # production
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Pages
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Route | What |
+| --- | --- |
+| `/` | Landing page (H1 + sample programs per level + method + FAQ schema) |
+| `/program-generator` | Interactive weekly program generator |
+| `/level-test` | 7-question level test, result saved in localStorage and reused by the generator |
+| `/skills`, `/skills/[slug]` | Skill roadmap + 6 progression pages with a step tracker |
+| `/blog`, `/blog/[slug]` | Blog (local demo posts for now) |
+| `/about`, `/contact`, `/privacy`, `/terms` | Trust pages |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+SEO built in: per-page metadata + canonicals, `sitemap.xml`, `robots.txt`, generated OG images (site + per article), JSON-LD (Organization, WebSite, BreadcrumbList, FAQPage, BlogPosting, Article).
 
-## Learn More
+## Environment
 
-To learn more about Next.js, take a look at the following resources:
+See `.env.example`: site URL, GA4 / Plausible, Google Search Console verification, newsletter webhook. Without `NEWSLETTER_WEBHOOK_URL` the form tells visitors the newsletter launches soon (no email is collected).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Plugging in Sanity
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+All blog data goes through `src/lib/posts.ts` (`getAllPosts`, `getPost`). To switch to Sanity:
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Replace the bodies of those two functions with GROQ queries (keep `"use cache"` + add `cacheTag("posts")`, revalidated by a Sanity webhook calling `revalidateTag`).
+2. Map Sanity fields to the `Post` type (`slug`, `title`, `seoTitle`, `description`, `category`, `publishedAt`, `updatedAt`, `author`, `body`).
+3. `body` is Markdown today, rendered by `src/components/Markdown.tsx`. With Portable Text, swap that component for `@portabletext/react` and update `getHeadings` for the table of contents.
+4. Delete `src/content/posts/`.
