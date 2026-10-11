@@ -1,9 +1,8 @@
-// Explicit URL wins (custom domain). Otherwise use the Vercel production URL (*.vercel.app),
-// so canonicals and the sitemap never point to a domain we don't own.
+// Canonical domain for every build (production and previews), so canonicals and the sitemap
+// always point to streetbarlab.com — never to a *.vercel.app URL. Override with NEXT_PUBLIC_SITE_URL.
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ||
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL && `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`) ||
-  "http://localhost:3000";
+  (process.env.NODE_ENV === "production" ? "https://streetbarlab.com" : "http://localhost:3000");
 
 export const site = {
   name: "StreetBarLab",
