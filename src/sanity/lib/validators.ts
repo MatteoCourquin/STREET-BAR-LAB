@@ -3,7 +3,7 @@ import type { SlugValue } from "sanity";
 // Zero-width spaces, joiners, BOM, soft hyphens… often left behind by AI copy-paste.
 const INVISIBLE_UNICODE = /[­​-‏‪-‮⁠-⁤﻿]/;
 
-export const KEBAB_CASE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const KEBAB_CASE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 export function validateKebabSlug(slug: SlugValue | undefined) {
   if (!slug?.current) return true;

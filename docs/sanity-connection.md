@@ -89,6 +89,15 @@ The response contains the new document `_id`. **Store it** in the tool: it is ho
 A document created this way is **published immediately**. To send it as a draft for review in the Studio
 instead, set `"_id": "drafts.<any-unique-id>"` in the `create` object.
 
+### When it shows up on the website
+
+Every published change (create, update, delete of an article or author) triggers a Sanity webhook that
+rebuilds the website on Vercel. The article is live about **1 minute** later. Drafts don't trigger anything.
+
+Each mutation request starts one rebuild, so send everything for an article in **one request**: upload the
+images first, then create the article with all its fields at once, rather than creating it and patching
+fields one by one.
+
 ## Update an article
 
 Replace the whole document with the `_id` returned at creation:
