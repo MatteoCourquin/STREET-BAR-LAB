@@ -22,13 +22,13 @@ npm run build && npm start   # production
 | `/level-test` | 7-question level test, result saved in localStorage and reused by the generator |
 | `/skills`, `/skills/[slug]` | Skill roadmap + 6 progression pages with a step tracker |
 | `/blog`, `/blog/[slug]` | Blog (local demo posts for now) |
-| `/about`, `/contact`, `/privacy`, `/terms` | Trust pages |
+| `/about`, `/privacy`, `/terms` | Trust pages |
 
 SEO built in: per-page metadata + canonicals, `sitemap.xml`, `robots.txt`, generated OG images (site + per article), JSON-LD (Organization, WebSite, BreadcrumbList, FAQPage, BlogPosting, Article).
 
 ## Environment
 
-See `.env.example`: site URL, GA4 / Plausible, Google Search Console verification, newsletter webhook. Without `NEWSLETTER_WEBHOOK_URL` the form tells visitors the newsletter launches soon (no email is collected).
+See `.env.example`: site URL, GA4 / Plausible, Google Search Console verification.
 
 ## Plugging in Sanity
 

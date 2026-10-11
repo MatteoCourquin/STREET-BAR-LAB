@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ProgramGenerator } from "@/components/ProgramGenerator";
-import { Newsletter } from "@/components/Newsletter";
+import { ToolsCta } from "@/components/ToolsCta";
 
 export const metadata: Metadata = {
   title: "Street Workout Program Generator (Free, Personalised)",
@@ -42,7 +42,7 @@ export default function Page() {
         ))}
       </section>
       <div className="mt-20 print:hidden">
-        <Newsletter title="Get your next progression by email" />
+        <ToolsCta title="Go further" exclude="/program-generator" />
       </div>
     </div>
   );

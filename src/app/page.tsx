@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Faq, type FaqItem } from "@/components/Faq";
 import { LevelTabs } from "@/components/LevelTabs";
-import { Newsletter } from "@/components/Newsletter";
+import { ToolsCta } from "@/components/ToolsCta";
 import { PostCard } from "@/components/PostCard";
 import { ProgramView } from "@/components/ProgramView";
 import { getAllPosts } from "@/lib/posts";
@@ -304,7 +304,7 @@ export default async function Home() {
       )}
 
       <div className="container-x">
-        <Newsletter />
+        <ToolsCta title="Start training today" />
       </div>
     </>
   );

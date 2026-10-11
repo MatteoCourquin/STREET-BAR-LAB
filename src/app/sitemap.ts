@@ -20,7 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly" as const,
       priority: 0.7,
     })),
-    ...["/about", "/contact", "/privacy", "/terms"].map((path) => ({
+    ...["/about", "/privacy", "/terms"].map((path) => ({
       url: absoluteUrl(path),
       changeFrequency: "yearly" as const,
       priority: 0.3,

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { Newsletter } from "@/components/Newsletter";
+import { ToolsCta } from "@/components/ToolsCta";
 import { PostCard } from "@/components/PostCard";
 import { getAllPosts } from "@/lib/posts";
 
@@ -30,7 +30,7 @@ export default async function Page() {
         ))}
       </div>
       <div className="mt-20">
-        <Newsletter />
+        <ToolsCta />
       </div>
     </div>
   );

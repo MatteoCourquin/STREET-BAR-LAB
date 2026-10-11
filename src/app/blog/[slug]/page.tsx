@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { getHeadings, Markdown } from "@/components/Markdown";
-import { Newsletter } from "@/components/Newsletter";
+import { ToolsCta } from "@/components/ToolsCta";
 import { formatDate, PostCard } from "@/components/PostCard";
 import { getAllPosts, getPost } from "@/lib/posts";
 import { absoluteUrl, jsonLd, site } from "@/lib/site";
@@ -116,7 +116,7 @@ export default async function Page({ params }: PageProps<"/blog/[slug]">) {
         </section>
       )}
       <div className="mx-auto mt-16 max-w-5xl">
-        <Newsletter />
+        <ToolsCta />
       </div>
       <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(articleLd)} />
     </article>
