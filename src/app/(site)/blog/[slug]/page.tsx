@@ -40,6 +40,7 @@ export async function generateMetadata({ params }: PageProps<"/blog/[slug]">): P
       authors: post.author ? [post.author.name] : undefined,
       section: post.category,
       tags: post.tags,
+      images: [{ url: `/og/blog/${post.slug}`, width: 1200, height: 630, alt: post.image?.alt ?? post.title }],
     },
   };
 }
@@ -253,7 +254,7 @@ function articleJsonLd(post: Post) {
     dateModified: post.updatedAt ?? post.publishedAt,
     url,
     mainEntityOfPage: url,
-    image: post.image ? urlFor(post.image).width(1200).height(630).url() : `${url}/opengraph-image`,
+    image: absoluteUrl(`/og/blog/${post.slug}`),
     inLanguage: "en",
     articleSection: post.category,
     keywords: post.tags?.join(", "),

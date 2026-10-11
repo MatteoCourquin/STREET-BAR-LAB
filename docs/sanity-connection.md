@@ -16,7 +16,7 @@ Base URL: `https://63wccw3u.api.sanity.io/v2026-10-11/data`
 
 Every request sends `Authorization: Bearer <SANITY_WRITE_TOKEN>`.
 
-The Studio (to check what the tool published) is at https://streetbarlab.sanity.studio.
+The Studio (to check what the tool published) is at https://streetbarlab.com/studio.
 
 ## Publish an article
 

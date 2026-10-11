@@ -33,7 +33,8 @@ The canonical domain (`https://streetbarlab.com`) is set in `src/lib/site.ts`; S
 
 ## Blog (Sanity)
 
-- Project `63wccw3u`, dataset `production` (public read). Studio: https://streetbarlab.sanity.studio, source in `studio/` (`cd studio && npm run dev`; deploy with `npx sanity schemas deploy && npx sanity deploy`).
+- Project `63wccw3u`, dataset `production` (public read). The Studio is embedded at https://streetbarlab.com/studio (`sanity.config.ts`, route `src/app/studio/[[...tool]]`, schema in `src/sanity/schemaTypes`). After a schema change, run `npx sanity schemas deploy` so API tools see it.
+- Website pages live in the `src/app/(site)` route group, which adds the header and footer; `/studio` renders full-screen outside it.
 - The website reads Sanity in `src/lib/posts.ts`, cached with `"use cache"` and `cacheLife("max")`.
 - A Sanity webhook (`blogPost`/`author` create, update, delete) calls a Vercel deploy hook: every publish rebuilds the site, which starts with an empty cache.
 - Articles are written by the SEO tool over the HTTP API: see [`docs/sanity-connection.md`](docs/sanity-connection.md). Long-form fields are Markdown, rendered by `src/components/Markdown.tsx`.
