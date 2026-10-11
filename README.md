@@ -34,5 +34,6 @@ The canonical domain (`https://streetbarlab.com`) is set in `src/lib/site.ts`; S
 ## Blog (Sanity)
 
 - Project `63wccw3u`, dataset `production` (public read). Studio: https://streetbarlab.sanity.studio, source in `studio/` (`cd studio && npm run dev`; deploy with `npx sanity schemas deploy && npx sanity deploy`).
-- The website reads Sanity in `src/lib/posts.ts`, cached with `"use cache"` and `cacheLife("minutes")`: published changes appear within about a minute, with no webhook or secret to configure.
+- The website reads Sanity in `src/lib/posts.ts`, cached with `"use cache"` and `cacheLife("max")`.
+- A Sanity webhook (`blogPost`/`author` create, update, delete) calls a Vercel deploy hook: every publish rebuilds the site, which starts with an empty cache.
 - Articles are written by the SEO tool over the HTTP API: see [`docs/sanity-connection.md`](docs/sanity-connection.md). Long-form fields are Markdown, rendered by `src/components/Markdown.tsx`.

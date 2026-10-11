@@ -91,15 +91,16 @@ const POST_QUERY = defineQuery(`
 
 export async function getAllPosts(): Promise<PostSummary[]> {
   "use cache";
-  // Re-checks Sanity at most once a minute: new articles show up without any webhook or secret.
-  cacheLife("minutes");
+  // Content only changes when something is published in Sanity, which triggers a Vercel deploy
+  // hook; each deploy starts with an empty cache, so there is no need to ever re-check.
+  cacheLife("max");
   const posts = await client.fetch<PostSummary[]>(POSTS_QUERY);
   return posts.map(withMinReadingTime);
 }
 
 export async function getPost(slug: string): Promise<Post | undefined> {
   "use cache";
-  cacheLife("minutes");
+  cacheLife("max");
   const post = await client.fetch<Post | null>(POST_QUERY, { slug });
   return post ? withMinReadingTime(post) : undefined;
 }
