@@ -20,11 +20,6 @@ export default function Page() {
         Your level test result and the skill steps you tick are saved in your browser&apos;s local storage only. They
         never leave your device and you can clear them at any time by clearing your browser data.
       </p>
-      <h2>Analytics</h2>
-      <p>
-        We may use analytics to understand which pages are useful (pages visited, referrer, device type). This data
-        is aggregated and we do not sell any data.
-      </p>
     </SimplePage>
   );
 }

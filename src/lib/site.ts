@@ -1,8 +1,6 @@
 // Canonical domain for every build (production and previews), so canonicals and the sitemap
-// always point to streetbarlab.com — never to a *.vercel.app URL. Override with NEXT_PUBLIC_SITE_URL.
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  (process.env.NODE_ENV === "production" ? "https://streetbarlab.com" : "http://localhost:3000");
+// always point to streetbarlab.com — never to a *.vercel.app URL.
+const siteUrl = process.env.NODE_ENV === "production" ? "https://streetbarlab.com" : "http://localhost:3000";
 
 export const site = {
   name: "StreetBarLab",

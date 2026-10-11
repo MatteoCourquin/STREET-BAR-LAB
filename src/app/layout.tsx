@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Anton, Inter } from "next/font/google";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Analytics } from "@/components/Analytics";
 import { absoluteUrl, jsonLd, site } from "@/lib/site";
 import "./globals.css";
 
@@ -24,9 +23,6 @@ export const metadata: Metadata = {
   },
   twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },
-  verification: process.env.GOOGLE_SITE_VERIFICATION
-    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
-    : undefined,
 };
 
 export const viewport: Viewport = {
@@ -70,7 +66,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </main>
         <Footer />
         <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(siteJsonLd)} />
-        <Analytics />
       </body>
     </html>
   );

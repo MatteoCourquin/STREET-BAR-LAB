@@ -8,7 +8,6 @@ Stack: Next.js 16 (App Router, Cache Components), Tailwind CSS v4, TypeScript.
 
 ```bash
 npm install
-cp .env.example .env.local   # fill in what you need
 npm run dev                  # http://localhost:3000
 npm run build && npm start   # production
 ```
@@ -28,7 +27,7 @@ SEO built in: per-page metadata + canonicals, `sitemap.xml`, `robots.txt`, gener
 
 ## Environment
 
-See `.env.example`: site URL, GA4 / Plausible, Google Search Console verification.
+No environment variables needed. The canonical domain (`https://streetbarlab.com`) is set in `src/lib/site.ts`; Search Console is verified by DNS.
 
 ## Plugging in Sanity
 
