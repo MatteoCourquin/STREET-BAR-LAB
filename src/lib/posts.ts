@@ -1,11 +1,8 @@
-import { cacheLife, cacheTag } from "next/cache";
+import { cacheLife } from "next/cache";
 import { defineQuery } from "next-sanity";
 import type { SanityImageSource } from "@sanity/image-url";
 import { site } from "@/lib/site";
 import { client } from "@/sanity/client";
-
-/** Every Sanity read is tagged with this; the /api/revalidate webhook invalidates it. */
-export const BLOG_CACHE_TAG = "blog";
 
 export type PostImage = SanityImageSource & { alt?: string };
 
@@ -94,16 +91,15 @@ const POST_QUERY = defineQuery(`
 
 export async function getAllPosts(): Promise<PostSummary[]> {
   "use cache";
-  cacheTag(BLOG_CACHE_TAG);
-  cacheLife("hours");
+  // Re-checks Sanity at most once a minute: new articles show up without any webhook or secret.
+  cacheLife("minutes");
   const posts = await client.fetch<PostSummary[]>(POSTS_QUERY);
   return posts.map(withMinReadingTime);
 }
 
 export async function getPost(slug: string): Promise<Post | undefined> {
   "use cache";
-  cacheTag(BLOG_CACHE_TAG);
-  cacheLife("hours");
+  cacheLife("minutes");
   const post = await client.fetch<Post | null>(POST_QUERY, { slug });
   return post ? withMinReadingTime(post) : undefined;
 }

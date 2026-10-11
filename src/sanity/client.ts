@@ -6,8 +6,8 @@ export const client = createClient({
   projectId: "63wccw3u",
   dataset: "production",
   apiVersion: "2026-10-11",
-  // Next's cache sits in front; reading from the API (not the CDN) avoids serving stale content
-  // right after a revalidation webhook.
+  // Next's cache sits in front; reading from the API (not the CDN) avoids stacking a second
+  // cache delay on top of it.
   useCdn: false,
   perspective: "published",
 });

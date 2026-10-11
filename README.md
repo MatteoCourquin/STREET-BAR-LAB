@@ -27,16 +27,12 @@ SEO built in: per-page metadata + canonicals, `sitemap.xml`, `robots.txt`, gener
 
 ## Environment
 
-| Variable | Where | What |
-| --- | --- | --- |
-| `SANITY_REVALIDATE_SECRET` | Vercel + `.env.local` | Shared with the Sanity webhook that calls `/api/revalidate`. Without it, new articles still appear, but only when the hourly cache expires. |
-| `SANITY_WRITE_TOKEN` | `.env.local` only | Editor token for the SEO tool. Not used by the website. |
+No environment variables needed on Vercel. `.env.local` holds `SANITY_WRITE_TOKEN`, the editor token for the SEO tool; the website never uses it.
 
 The canonical domain (`https://streetbarlab.com`) is set in `src/lib/site.ts`; Search Console is verified by DNS.
 
 ## Blog (Sanity)
 
 - Project `63wccw3u`, dataset `production` (public read). Studio: https://streetbarlab.sanity.studio, source in `studio/` (`cd studio && npm run dev`; deploy with `npx sanity schemas deploy && npx sanity deploy`).
-- The website reads Sanity in `src/lib/posts.ts` (cached with `"use cache"`, tag `blog`, 1 h lifetime).
-- A Sanity webhook (`blogPost`/`author` create, update, delete) calls `/api/revalidate`, which expires the `blog` tag.
+- The website reads Sanity in `src/lib/posts.ts`, cached with `"use cache"` and `cacheLife("minutes")`: published changes appear within about a minute, with no webhook or secret to configure.
 - Articles are written by the SEO tool over the HTTP API: see [`docs/sanity-connection.md`](docs/sanity-connection.md). Long-form fields are Markdown, rendered by `src/components/Markdown.tsx`.
