@@ -3,7 +3,8 @@ import { absoluteUrl, jsonLd } from "@/lib/site";
 
 type Crumb = { name: string; href: string };
 
-export function Breadcrumbs({ items }: { items: Crumb[] }) {
+/** `structuredData={false}` when the page ships its own JSON-LD. */
+export function Breadcrumbs({ items, structuredData = true }: { items: Crumb[]; structuredData?: boolean }) {
   const all = [{ name: "Home", href: "/" }, ...items];
   const data = {
     "@context": "https://schema.org",
@@ -34,7 +35,7 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
           </li>
         ))}
       </ol>
-      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(data)} />
+      {structuredData && <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(data)} />}
     </nav>
   );
 }

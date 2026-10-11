@@ -20,20 +20,23 @@ npm run build && npm start   # production
 | `/program-generator` | Interactive weekly program generator |
 | `/level-test` | 7-question level test, result saved in localStorage and reused by the generator |
 | `/skills`, `/skills/[slug]` | Skill roadmap + 6 progression pages with a step tracker |
-| `/blog`, `/blog/[slug]` | Blog (local demo posts for now) |
+| `/blog`, `/blog/[slug]` | Blog, content from Sanity |
 | `/about`, `/privacy`, `/terms` | Trust pages |
 
 SEO built in: per-page metadata + canonicals, `sitemap.xml`, `robots.txt`, generated OG images (site + per article), JSON-LD (Organization, WebSite, BreadcrumbList, FAQPage, BlogPosting, Article).
 
 ## Environment
 
-No environment variables needed. The canonical domain (`https://streetbarlab.com`) is set in `src/lib/site.ts`; Search Console is verified by DNS.
+| Variable | Where | What |
+| --- | --- | --- |
+| `SANITY_REVALIDATE_SECRET` | Vercel + `.env.local` | Shared with the Sanity webhook that calls `/api/revalidate`. Without it, new articles still appear, but only when the hourly cache expires. |
+| `SANITY_WRITE_TOKEN` | `.env.local` only | Editor token for the SEO tool. Not used by the website. |
 
-## Plugging in Sanity
+The canonical domain (`https://streetbarlab.com`) is set in `src/lib/site.ts`; Search Console is verified by DNS.
 
-All blog data goes through `src/lib/posts.ts` (`getAllPosts`, `getPost`). To switch to Sanity:
+## Blog (Sanity)
 
-1. Replace the bodies of those two functions with GROQ queries (keep `"use cache"` + add `cacheTag("posts")`, revalidated by a Sanity webhook calling `revalidateTag`).
-2. Map Sanity fields to the `Post` type (`slug`, `title`, `seoTitle`, `description`, `category`, `publishedAt`, `updatedAt`, `author`, `body`).
-3. `body` is Markdown today, rendered by `src/components/Markdown.tsx`. With Portable Text, swap that component for `@portabletext/react` and update `getHeadings` for the table of contents.
-4. Delete `src/content/posts/`.
+- Project `63wccw3u`, dataset `production` (public read). Studio: https://streetbarlab.sanity.studio, source in `studio/` (`cd studio && npm run dev`; deploy with `npx sanity schemas deploy && npx sanity deploy`).
+- The website reads Sanity in `src/lib/posts.ts` (cached with `"use cache"`, tag `blog`, 1 h lifetime).
+- A Sanity webhook (`blogPost`/`author` create, update, delete) calls `/api/revalidate`, which expires the `blog` tag.
+- Articles are written by the SEO tool over the HTTP API: see [`docs/sanity-connection.md`](docs/sanity-connection.md). Long-form fields are Markdown, rendered by `src/components/Markdown.tsx`.

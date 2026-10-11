@@ -1,11 +1,11 @@
 import Link from "next/link";
-import type { PostWithMeta } from "@/lib/posts";
+import type { PostSummary } from "@/lib/posts";
 
 export function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" });
 }
 
-export function PostCard({ post }: { post: PostWithMeta }) {
+export function PostCard({ post }: { post: PostSummary }) {
   return (
     <article className="card group relative flex flex-col p-6 transition-colors hover:border-accent/60">
       <p className="eyebrow">{post.category}</p>

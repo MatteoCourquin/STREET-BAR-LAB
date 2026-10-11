@@ -2,7 +2,8 @@ import { jsonLd } from "@/lib/site";
 
 export type FaqItem = { q: string; a: string };
 
-export function Faq({ items }: { items: FaqItem[] }) {
+/** `structuredData={false}` when the page ships its own JSON-LD. */
+export function Faq({ items, structuredData = true }: { items: FaqItem[]; structuredData?: boolean }) {
   const data = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -26,7 +27,7 @@ export function Faq({ items }: { items: FaqItem[] }) {
           <p className="pb-5 text-sm leading-relaxed text-muted">{i.a}</p>
         </details>
       ))}
-      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(data)} />
+      {structuredData && <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(data)} />}
     </div>
   );
 }

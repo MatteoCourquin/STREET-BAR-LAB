@@ -1,10 +1,10 @@
 import type { MetadataRoute } from "next";
-import { getAllPosts } from "@/lib/posts";
+import { getAllPosts, isIndexable } from "@/lib/posts";
 import { skills } from "@/lib/skills";
 import { absoluteUrl } from "@/lib/site";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const posts = await getAllPosts();
+  const posts = (await getAllPosts()).filter(isIndexable);
   const latest = posts[0]?.updatedAt ?? posts[0]?.publishedAt;
 
   return [

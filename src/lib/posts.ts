@@ -1,36 +1,131 @@
-import { posts as localPosts } from "@/content/posts";
+import { cacheLife, cacheTag } from "next/cache";
+import { defineQuery } from "next-sanity";
+import type { SanityImageSource } from "@sanity/image-url";
+import { site } from "@/lib/site";
+import { client } from "@/sanity/client";
 
-export type Post = {
+/** Every Sanity read is tagged with this; the /api/revalidate webhook invalidates it. */
+export const BLOG_CACHE_TAG = "blog";
+
+export type PostImage = SanityImageSource & { alt?: string };
+
+export type PostSummary = {
+  id: string;
   slug: string;
   title: string;
-  /** Used for <title> when set, otherwise `title`. */
-  seoTitle?: string;
   description: string;
   category: string;
-  publishedAt: string; // ISO date
+  publishedAt: string; // YYYY-MM-DD
   updatedAt?: string;
-  author: string;
-  /** Markdown body. With Sanity this becomes Portable Text. */
-  body: string;
+  image: PostImage | null;
+  noIndex: boolean;
+  canonicalUrl?: string;
+  readingMinutes: number;
 };
 
-export type PostWithMeta = Post & { readingMinutes: number };
+export type Author = {
+  name: string;
+  jobTitle?: string;
+  bio?: string;
+  image: PostImage | null;
+  sameAs?: string[];
+};
 
-function withMeta(p: Post): PostWithMeta {
-  const words = p.body.split(/\s+/).length;
-  return { ...p, readingMinutes: Math.max(1, Math.round(words / 230)) };
+export type Post = PostSummary & {
+  metaTitle?: string;
+  tags?: string[];
+  author: Author | null;
+  schemaType: "BlogPosting" | "Article";
+  /** Custom JSON-LD from the Studio; replaces the generated structured data when set. */
+  jsonLd?: string;
+  introduction?: string;
+  keyTakeaways?: string[];
+  body: string;
+  faq?: { q: string; a: string }[];
+  conclusion?: string;
+  cta?: { text?: string; buttonLabel?: string; href?: string };
+  sources?: { label: string; url: string }[];
+  relatedSkills?: string[];
+  relatedPostIds?: string[];
+};
+
+// Fallbacks live in GROQ so the generator can omit any optional field.
+// Reading time: ~6 characters per word, 230 words per minute.
+const summaryProjection = `
+  "id": _id,
+  "slug": slug.current,
+  "title": coalesce(h1, metaTitle, slug.current),
+  "description": coalesce(metaDescription, ""),
+  "category": coalesce(category, "Blog"),
+  publishedAt,
+  updatedAt,
+  "image": featuredImage{asset, crop, hotspot, alt},
+  "noIndex": noIndex == true,
+  canonicalUrl,
+  "readingMinutes": round(length(coalesce(introduction, "") + coalesce(body, "") + coalesce(conclusion, "")) / 6 / 230)
+`;
+
+const POSTS_QUERY = defineQuery(`
+  *[_type == "blogPost" && defined(slug.current) && defined(publishedAt)]
+  | order(publishedAt desc, _createdAt desc) { ${summaryProjection} }
+`);
+
+const POST_QUERY = defineQuery(`
+  *[_type == "blogPost" && slug.current == $slug][0] {
+    ${summaryProjection},
+    metaTitle,
+    tags,
+    "author": coalesce(author->, *[_type == "author" && isDefault == true][0]) {
+      name, jobTitle, bio, sameAs, "image": image{asset, crop, hotspot, alt}
+    },
+    "schemaType": coalesce(schemaType, "BlogPosting"),
+    "jsonLd": structuredDataJsonLd,
+    introduction,
+    keyTakeaways,
+    "body": coalesce(body, ""),
+    "faq": faq[defined(question) && defined(answer)]{ "q": question, "a": answer },
+    conclusion,
+    cta,
+    "sources": sources[defined(label) && defined(url)]{ label, url },
+    relatedSkills,
+    "relatedPostIds": relatedPosts[]._ref
+  }
+`);
+
+export async function getAllPosts(): Promise<PostSummary[]> {
+  "use cache";
+  cacheTag(BLOG_CACHE_TAG);
+  cacheLife("hours");
+  const posts = await client.fetch<PostSummary[]>(POSTS_QUERY);
+  return posts.map(withMinReadingTime);
 }
 
-// Data access layer — swap the bodies of these functions for Sanity (GROQ) queries later.
-// The pages only depend on these signatures.
-
-export async function getAllPosts(): Promise<PostWithMeta[]> {
+export async function getPost(slug: string): Promise<Post | undefined> {
   "use cache";
-  return localPosts.map(withMeta).sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+  cacheTag(BLOG_CACHE_TAG);
+  cacheLife("hours");
+  const post = await client.fetch<Post | null>(POST_QUERY, { slug });
+  return post ? withMinReadingTime(post) : undefined;
 }
 
-export async function getPost(slug: string): Promise<PostWithMeta | undefined> {
-  "use cache";
-  const p = localPosts.find((x) => x.slug === slug);
-  return p && withMeta(p);
+/** Hand-picked related posts first, then the same category, then the latest. */
+export async function getRelatedPosts(post: Post, limit = 3): Promise<PostSummary[]> {
+  const others = (await getAllPosts()).filter((p) => p.id !== post.id);
+  const picked = (post.relatedPostIds ?? [])
+    .map((id) => others.find((p) => p.id === id))
+    .filter((p) => p !== undefined);
+  const rest = [
+    ...others.filter((p) => p.category === post.category),
+    ...others.filter((p) => p.category !== post.category),
+  ];
+  return [...new Set([...picked, ...rest])].slice(0, limit);
+}
+
+/** Posts that belong in the sitemap: indexable and canonical to this site. */
+export function isIndexable(post: PostSummary) {
+  return !post.noIndex && (!post.canonicalUrl || post.canonicalUrl.startsWith(site.url));
+}
+
+function withMinReadingTime<T extends PostSummary>(post: T): T {
+  return { ...post, readingMinutes: Math.max(1, post.readingMinutes) };
 }
